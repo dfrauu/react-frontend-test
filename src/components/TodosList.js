@@ -3,9 +3,10 @@ import React, { useState, useEffect, useRef } from "react";
 const TodosList = () => {
   const [todos, setTodos] = useState([]);
   const [filteredTodos, setFilteredTodos] = useState([]);
+  const [favorites, setFavorites] = useState([]); // State to store favorites
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchQuery, setSearchQuery] = useState(""); // state for search query
-  const [filter, setFilter] = useState("all"); // state for filter selection (completed, not completed, or all)
+  const [searchQuery, setSearchQuery] = useState(""); 
+  const [filter, setFilter] = useState("all");
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredTodos.length / itemsPerPage);
   const breadcrumbRef = useRef(null);
@@ -17,7 +18,7 @@ const TodosList = () => {
         const response = await fetch("https://jsonplaceholder.typicode.com/todos");
         const data = await response.json();
         setTodos(data);
-        setFilteredTodos(data); // initially set filteredTodos to the full list
+        setFilteredTodos(data); 
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -27,7 +28,6 @@ const TodosList = () => {
   }, []);
 
   useEffect(() => {
-    // Filter todos based on the selected filter and search query
     let filtered = todos.filter((todo) =>
       todo.title.toLowerCase().includes(searchQuery) || todo.id.toString().includes(searchQuery)
     );
@@ -39,7 +39,7 @@ const TodosList = () => {
     }
 
     setFilteredTodos(filtered);
-    setCurrentPage(1); // Reset to page 1 when the filter or search changes
+    setCurrentPage(1);
   }, [todos, searchQuery, filter]);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -85,12 +85,44 @@ const TodosList = () => {
     setSearchQuery(""); // Clear the input field
   };
 
-  // Check if the filteredTodos is empty and no results are found
   const isEmpty = filteredTodos.length === 0;
+
+  // Function to add or remove todo from favorites
+  const toggleFavorite = (todo) => {
+    setFavorites((prevFavorites) => {
+      if (prevFavorites.some((fav) => fav.id === todo.id)) {
+        return prevFavorites.filter((fav) => fav.id !== todo.id); // Remove from favorites
+      } else {
+        return [...prevFavorites, todo]; // Add to favorites
+      }
+    });
+  };
+
+  // Function to remove todo from favorites directly from the favorites section
+  const removeFromFavorites = (todo) => {
+    setFavorites((prevFavorites) => prevFavorites.filter((fav) => fav.id !== todo.id));
+  };
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <h2>Todo List</h2>
+      <style>
+        {`
+          /* Default max-width to 100% */
+          .todos-container, .favorites-container {
+            max-width: 100%;
+            margin: 0 auto;
+          }
+
+          /* For screens wider than 768px (desktop screens) */
+          @media (min-width: 768px) {
+            .todos-container, .favorites-container {
+              max-width: 80%;
+            }
+          }
+        `}
+      </style>
+
+      <h2 style={{ textAlign: "center" }}>Todo List</h2>
 
       {/* Search Bar */}
       <div style={{ marginBottom: "20px", width: "100%", maxWidth: "400px", margin: "0 auto", position: "relative" }}>
@@ -106,7 +138,7 @@ const TodosList = () => {
             maxWidth: "100%",
             borderRadius: "5px",
             border: "1px solid #ccc",
-            boxSizing: "border-box", // Ensures padding and border are inside the width
+            boxSizing: "border-box",
           }}
         />
         {searchQuery && (
@@ -138,14 +170,14 @@ const TodosList = () => {
       <div style={{ textAlign: "center", marginBottom: "20px", width: "100%", maxWidth: "400px", margin: "0 auto" }}>
         <div style={{
           display: "flex",
-          justifyContent: "space-between", // evenly spaces the buttons
-          width: "100%", // Ensures that the total width is 100% of the container
-          gap: "10px", // Adds space between the buttons
+          justifyContent: "space-between",
+          width: "100%",
+          gap: "10px",
         }}>
           <button
             onClick={() => setFilter("all")}
             style={{
-              flex: 1, // Makes the buttons equally spaced
+              flex: 1,
               backgroundColor: filter === "all" ? "lightblue" : "transparent",
               padding: "10px 15px",
               cursor: "pointer",
@@ -158,7 +190,7 @@ const TodosList = () => {
           <button
             onClick={() => setFilter("completed")}
             style={{
-              flex: 1, // Makes the buttons equally spaced
+              flex: 1,
               backgroundColor: filter === "completed" ? "lightgreen" : "transparent",
               padding: "10px 15px",
               cursor: "pointer",
@@ -171,7 +203,7 @@ const TodosList = () => {
           <button
             onClick={() => setFilter("notCompleted")}
             style={{
-              flex: 1, // Makes the buttons equally spaced
+              flex: 1,
               backgroundColor: filter === "notCompleted" ? "lightcoral" : "transparent",
               padding: "10px 15px",
               cursor: "pointer",
@@ -193,7 +225,6 @@ const TodosList = () => {
         <>
           {/* Pagination Controls at the Top */}
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "5px" }}>
-            {/* Previous Page Button */}
             <button
               onClick={() => changePage("prev")}
               disabled={currentPage === 1}
@@ -239,7 +270,6 @@ const TodosList = () => {
                       color: currentPage === page ? "blue" : "black",
                       padding: "5px 10px",
                       borderRadius: "5px",
-                      background: currentPage === page ? "lightblue" : "transparent",
                     }}
                   >
                     {page}
@@ -248,16 +278,15 @@ const TodosList = () => {
               })}
             </div>
 
-            {/* Next Page Button */}
             <button
               onClick={() => changePage("next")}
-              disabled={currentPage >= totalPages}
+              disabled={currentPage === totalPages}
               style={{
                 background: "none",
                 border: "none",
                 fontSize: "1.5rem",
-                cursor: currentPage >= totalPages ? "default" : "pointer",
-                color: currentPage >= totalPages ? "gray" : "black",
+                cursor: currentPage === totalPages ? "default" : "pointer",
+                color: currentPage === totalPages ? "gray" : "black",
                 marginLeft: "5px",
               }}
             >
@@ -265,29 +294,104 @@ const TodosList = () => {
             </button>
           </div>
 
-          {/* Centered Pagination Info */}
-          <div style={{ textAlign: "center", marginTop: "5px", fontSize: "0.75rem" }}>
-            Page {currentPage} of {totalPages}
-          </div><br></br>
-
           {/* Todo List */}
-          <ul ref={listRef} style={{ listStyle: "none", padding: 0 }}>
-            {paginatedTodos.map((todo) => (
-              <li
-                key={todo.id}
-                style={{
-                  padding: "10px",
-                  margin: "5px 0",
-                  background: todo.completed ? "#d4edda" : "#f8d7da",
-                  border: "1px solid #ccc",
-                }}
-              >
-                {todo.id}. {todo.title}
-              </li>
-            ))}
-          </ul>
+          <div ref={listRef}>
+            <div className="todos-container" style={{ margin: "0 auto", maxWidth: "90%" }}>
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {paginatedTodos.map((todo) => (
+                  <li
+                    key={todo.id}
+                    style={{
+                      padding: "10px",
+                      margin: "5px 0",
+                      backgroundColor: todo.completed ? "#d4edda" : "#f8d7da", // Maintain original color
+                      border: favorites.some((fav) => fav.id === todo.id)
+                        ? "2px solid #007bff" // Add a border to favorites
+                        : "none",
+                      boxShadow: favorites.some((fav) => fav.id === todo.id)
+                        ? "0 0 10px rgba(0, 123, 255, 0.5)" // Light blue shadow for favorites
+                        : "none",
+                      display: "flex",
+                      justifyContent: "space-between", // Aligns title and button
+                      flexWrap: "wrap", // Ensures wrapping if text overflows
+                      alignItems: "center",
+                    }}
+                  >
+                    <span style={{ flex: 1, wordWrap: "break-word" }}>{todo.title}</span>
+                    <div>
+                      <button
+                        onClick={() => toggleFavorite(todo)}
+                        style={{
+                          marginLeft: "10px",
+                          backgroundColor: favorites.some((fav) => fav.id === todo.id)
+                            ? "red"
+                            : "#007bff",
+                          color: "white",
+                          border: "none",
+                          padding: "5px",
+                          cursor: "pointer",
+                          borderRadius: "5px",
+                        }}
+                      >
+                        {favorites.some((fav) => fav.id === todo.id) ? "Remove from Favorites" : "Add to Favorites"}
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </>
       )}
+
+      {/* Favorites Section */}
+      <div>
+        <h3 style={{ textAlign: "center" }}>Favorites</h3>
+        <div className="favorites-container" style={{ margin: "0 auto", maxWidth: "90%" }}>
+          {favorites.length > 0 ? (
+            <ul style={{ listStyle: "none", padding: 0 }}>
+              {favorites.map((fav) => (
+                <li
+                  key={fav.id}
+                  style={{
+                    padding: "10px",
+                    margin: "5px 0",
+                    backgroundColor: fav.completed ? "#d4edda" : "#f8d7da", // Maintain original color
+                    border: "2px solid #007bff", // Highlight favorites with a border
+                    boxShadow: "0 0 10px rgba(0, 123, 255, 0.5)", // Light blue shadow for favorites
+                    display: "flex",
+                    justifyContent: "space-between", // Aligns title and button
+                    flexWrap: "wrap", // Ensures wrapping if text overflows
+                    alignItems: "center",
+                  }}
+                >
+                  <span style={{ flex: 1, wordWrap: "break-word" }}>{fav.title}</span>
+                  <div>
+                    <button
+                      onClick={() => removeFromFavorites(fav)}
+                      style={{
+                        marginLeft: "10px",
+                        backgroundColor: "red",
+                        color: "white",
+                        border: "none",
+                        padding: "5px",
+                        cursor: "pointer",
+                        borderRadius: "5px",
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p style={{ textAlign: "center", fontSize: "1rem", color: "gray" }}>
+              No items have been added to Favorites yet.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
