@@ -105,23 +105,7 @@ const TodosList = () => {
 
   return (
     <div style={{ padding: "20px", fontFamily: "Arial" }}>
-      <style>
-        {`
-          /* Default max-width to 100% */
-          .todos-container, .favorites-container {
-            max-width: 100%;
-            margin: 0 auto;
-          }
-
-          /* For screens wider than 768px (desktop screens) */
-          @media (min-width: 768px) {
-            .todos-container, .favorites-container {
-              max-width: 80%;
-            }
-          }
-        `}
-      </style>
-
+        
       <h2 style={{ textAlign: "center" }}>Todo List</h2>
 
       {/* Search Bar */}
@@ -317,7 +301,15 @@ const TodosList = () => {
                       alignItems: "center",
                     }}
                   >
-                    <span style={{ flex: 1, wordWrap: "break-word" }}>{todo.title}</span>
+                    <span style={{ flex: 0, wordWrap: "break-word", marginRight: "10px" }}>
+                      {todo.completed ? "✔️" : "❌"}
+                    </span>
+                    <span style={{ flex: 1, wordWrap: "break-word"}}>
+                      {todo.id.toString()}. {todo.title}
+                    </span>
+                    <span style={{ flex: 1, wordWrap: "break-word"}}>
+                      User ID: <b>{todo.userId}</b>
+                    </span>
                     <div>
                       <button
                         onClick={() => toggleFavorite(todo)}
@@ -365,7 +357,15 @@ const TodosList = () => {
                     alignItems: "center",
                   }}
                 >
-                  <span style={{ flex: 1, wordWrap: "break-word" }}>{fav.title}</span>
+                  <span style={{ flex: 0, wordWrap: "break-word", marginRight: "10px" }}>
+                    {fav.completed ? "✔️" : "❌"}
+                  </span>
+                  <span style={{ flex: 1, wordWrap: "break-word"}}>
+                    {fav.id.toString()}. {fav.title}
+                  </span>
+                  <span style={{ flex: 1, wordWrap: "break-word"}}>
+                    User ID: <b>{fav.userId}</b>
+                  </span>
                   <div>
                     <button
                       onClick={() => removeFromFavorites(fav)}
