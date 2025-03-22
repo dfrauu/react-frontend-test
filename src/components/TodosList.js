@@ -16,6 +16,7 @@ const TodosList = () => {
   const [favorites, setFavorites] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
+  const [userIdFilter, setUserIdFilter] = useState(""); // Stores selected user ID filter
   const [filter, setFilter] = useState("all");
   const itemsPerPage = 10;
   const totalPages = Math.ceil(filteredTodos.length / itemsPerPage);
@@ -36,23 +37,32 @@ const TodosList = () => {
     fetchTodos();
   }, []);
 
-  // Filter and format todos based on search query and filter.
+  // Extract unique user IDs for the dropdown filter.
+  const userIds = [...new Set(todos.map((todo) => todo.userId))].sort((a, b) => a - b);
+
+  // Filter and format todos based on search query and filter settings.
   useEffect(() => {
     let filtered = todos.filter(
       (todo) =>
-        todo.title.toLowerCase().includes(searchQuery) ||
+        todo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         todo.id.toString().includes(searchQuery)
     );
 
+    // Filter based on completion status
     if (filter === "completed") {
       filtered = filtered.filter((todo) => todo.completed);
     } else if (filter === "notCompleted") {
       filtered = filtered.filter((todo) => !todo.completed);
     }
 
+    // Filter based on user ID
+    if (userIdFilter !== "") {
+      filtered = filtered.filter((todo) => todo.userId === Number(userIdFilter));
+    }
+
     setFilteredTodos(filtered);
     setCurrentPage(1);
-  }, [todos, searchQuery, filter]);
+  }, [todos, searchQuery, filter, userIdFilter]);
 
   // Variables for paginating todos based on current page and items per page.
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -74,8 +84,14 @@ const TodosList = () => {
         Todo List
       </Typography>
 
-      {/* Implement SearchBar and FilterButtons components */}
-      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      {/* Implement SearchBar with User ID filter */}
+      <SearchBar
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        userIdFilter={userIdFilter}
+        setUserIdFilter={setUserIdFilter}
+        userIds={userIds}
+      />
       <FilterButtons filter={filter} setFilter={setFilter} />
 
       {/* Conditional rendering based on the amount of filtered todos */}
@@ -96,7 +112,7 @@ const TodosList = () => {
           ))}
         </>
       )}
-      <br/>
+      <br />
       <FavoritesList favorites={favorites} toggleFavorite={toggleFavorite} />
     </Container>
   );

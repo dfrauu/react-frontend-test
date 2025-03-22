@@ -38,10 +38,12 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
         ref={breadcrumbRef}
         sx={{
           display: "flex",
+          // Attribute to allow horizontal scrolling when the content exceeds the container width
           overflowX: "auto",
           whiteSpace: "nowrap",
           padding: "10px",
-          maxWidth: "60%",
+          // Attribute to limit the width of the breadcrumb element for wider screens
+          maxWidth: "100%",
           borderRadius: "15px",
           scrollbarWidth: "thin",
           "&::-webkit-scrollbar": { height: "5px" },
