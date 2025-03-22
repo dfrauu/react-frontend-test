@@ -82,7 +82,7 @@ const TodosList = () => {
     <Container sx={{ padding: "20px", fontFamily: "Arial" }}>
       <Typography variant="h4" align="center">
         Todo List
-      </Typography>
+      </Typography><br/>
 
       {/* Implement SearchBar with User ID filter */}
       <SearchBar

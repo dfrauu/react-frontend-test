@@ -8,7 +8,7 @@ const FavoritesList = ({ favorites, toggleFavorite }) => {
     <div>
       <Typography variant="h5" align="center">
         Favorites
-      </Typography>
+      </Typography><br/>
 
       {/* Conditional rendering based on the amount of favorite todos */}
       {favorites.length > 0 ? (
@@ -19,7 +19,7 @@ const FavoritesList = ({ favorites, toggleFavorite }) => {
         <Typography align="center" color="gray">
           No items have been added to Favorites yet.
         </Typography>
-      )}
+      )}<br/>
     </div>
   );
 };

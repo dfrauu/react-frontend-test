@@ -27,58 +27,73 @@ const Pagination = ({ currentPage, totalPages, setCurrentPage }) => {
 
   // Scrollable pagination component with breadcrumbs and arrow buttons
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" my={2}>
-      {/* Previous Button */}
-      <IconButton onClick={() => changePage("prev")} disabled={currentPage === 1}>
-        <ArrowBackIosIcon color={currentPage === 1 ? "disabled" : "primary"} />
-      </IconButton>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        maxWidth: "100%", // Prevents overflow
+        overflow: "hidden",
+        my: 2,
+      }}
+    >
+      {/* Pagination Controls */}
+      <Box display="flex" alignItems="center">
+        {/* Previous Button */}
+        <IconButton onClick={() => changePage("prev")} disabled={currentPage === 1}>
+          <ArrowBackIosIcon color={currentPage === 1 ? "disabled" : "primary"} />
+        </IconButton>
 
-      {/* Scrollable Breadcrumb Navigation Element */}
-      <Box
-        ref={breadcrumbRef}
-        sx={{
-          display: "flex",
-          // Attribute to allow horizontal scrolling when the content exceeds the container width
-          overflowX: "auto",
-          whiteSpace: "nowrap",
-          padding: "10px",
-          // Attribute to limit the width of the breadcrumb element for wider screens
-          maxWidth: "100%",
-          borderRadius: "15px",
-          scrollbarWidth: "thin",
-          "&::-webkit-scrollbar": { height: "5px" },
-          "&::-webkit-scrollbar-thumb": { background: "gray", borderRadius: "5px" },
-          boxShadow: "inset 5px 0 10px -5px rgba(0, 0, 0, 0.2), inset -5px 0 10px -5px rgba(0, 0, 0, 0.2)", // Box shadow for left and right edges
-        }}
-      >
-        {[...Array(totalPages)].map((_, index) => {
-          const page = index + 1;
-          return (
-            <Typography
-              key={page}
-              data-page={page}
-              onClick={() => setCurrentPage(page)}
-              sx={{
-                mx: 1,
-                cursor: "pointer",
-                fontWeight: currentPage === page ? "bold" : "normal",
-                textDecoration: currentPage === page ? "underline" : "none",
-                color: currentPage === page ? "primary.main" : "text.primary",
-                padding: "5px 10px",
-                borderRadius: "5px",
-                "&:hover": { color: "primary.dark" },
-              }}
-            >
-              {page}
-            </Typography>
-          );
-        })}
+        {/* Scrollable Page Numbers */}
+        <Box
+          ref={breadcrumbRef}
+          sx={{
+            display: "flex",
+            overflowX: "auto",
+            whiteSpace: "nowrap",
+            padding: "10px",
+            borderRadius: "15px",
+            maxWidth: "80vw", // Prevents horizontal overflow
+            scrollbarWidth: "thin",
+            "&::-webkit-scrollbar": { height: "5px" },
+            "&::-webkit-scrollbar-thumb": { background: "gray", borderRadius: "5px" },
+            boxShadow: "inset 5px 0 10px -5px rgba(0, 0, 0, 0.2), inset -5px 0 10px -5px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          {[...Array(totalPages)].map((_, index) => {
+            const page = index + 1;
+            return (
+              <Typography
+                key={page}
+                data-page={page}
+                onClick={() => setCurrentPage(page)}
+                sx={{
+                  mx: 1,
+                  cursor: "pointer",
+                  fontWeight: currentPage === page ? "bold" : "normal",
+                  textDecoration: currentPage === page ? "underline" : "none",
+                  color: currentPage === page ? "primary.main" : "text.primary",
+                  padding: "5px 10px",
+                  borderRadius: "5px",
+                  "&:hover": { color: "primary.dark" },
+                }}
+              >
+                {page}
+              </Typography>
+            );
+          })}
+        </Box>
+
+        {/* Next Button */}
+        <IconButton onClick={() => changePage("next")} disabled={currentPage === totalPages}>
+          <ArrowForwardIosIcon color={currentPage === totalPages ? "disabled" : "primary"} />
+        </IconButton>
       </Box>
 
-      {/* Next Button */}
-      <IconButton onClick={() => changePage("next")} disabled={currentPage === totalPages}>
-        <ArrowForwardIosIcon color={currentPage === totalPages ? "disabled" : "primary"} />
-      </IconButton>
+      {/* Page Indicator: "Page X of Y" (inside the container, below the pagination bar) */}
+      <Typography sx={{ fontSize: "0.85rem", color: "gray", mt: 1 }}>
+        Page {currentPage} of {totalPages}
+      </Typography>
     </Box>
   );
 };
